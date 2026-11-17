@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quizzes</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+  :root {
+    --bg: #f0f4f8; --card: #ffffff; --text: #2d3436; --muted: #636e72;
+    --border: #dfe6e9; --primary: #6c5ce7; --primary-hover: #5a4bd1;
+    --success: #00b894; --danger: #d63031; --warning: #fdcb6e;
+  }
+  body { background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* Auth Screen */
+  .auth-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:1rem; background: linear-gradient(135deg, #667eea, #764ba2); }
+  .auth-card { background:white; padding:2.5rem; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.2); width:100%; max-width:400px; }
+  .auth-card h1 { text-align:center; font-size:2rem; margin-bottom:0.3rem; background:linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .auth-card .subtitle { text-align:center; color:var(--muted); margin-bottom:1.5rem; font-size:0.9rem; }
+  .auth-tabs { display:flex; gap:0.4rem; margin-bottom:1.5rem; background:#f1f2f6; padding:0.3rem; border-radius:10px; }
+  .auth-tab { flex:1; padding:0.6rem; text-align:center; border-radius:8px; cursor:pointer; font-weight:600; color:var(--muted); transition:all 0.2s; user-select:none; }
+  .auth-tab.active { background:white; color:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+  .auth-form .form-group { margin-bottom:1rem; }
+  .auth-form label { display:block; margin-bottom:0.3rem; font-size:0.85rem; font-weight:600; color:var(--muted); }
+  .auth-form input { width:100%; padding:0.8rem 1rem; border:2px solid var(--border); border-radius:10px; font-size:1rem; transition:border 0.2s; }
+  .auth-form input:focus { outline:none; border-color:var(--primary); }
+  .auth-form button { width:100%; padding:0.9rem; background:var(--primary); color:white; border:none; border-radius:10px; font-size:1rem; font-weight:600; cursor:pointer; transition:all 0.2s; margin-top:0.5rem; }
+  .auth-form button:hover { background:var(--primary-hover); transform:translateY(-1px); }
+  .auth-error { color:var(--danger); font-size:0.85rem; margin-top:0.8rem; text-align:center; min-height:1em; }
+
+  /* App */
+  .app { display:none; }
+  .app.visible { display:block; }
+  header { background:white; border-bottom:1px solid var(--border); padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:10; flex-wrap:wrap; gap:0.75rem; }
+  .logo { font-size:1.5rem; font-weight:700; background:linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; cursor:pointer; }
+  .user-area { display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; }
+  .user-info { font-size:0.85rem; color:var(--muted); display:flex; align-items:center; gap:0.4rem; }
+  .user-info strong { color:var(--text); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .admin-badge { background:#ffd700; color:#5d4500; padding:0.2rem 0.6rem; border-radius:20px; font-size:0.7rem; font-weight:700; display:none; }
+
+  main { max-width:1200px; margin:0 auto; padding:2rem; }
+  .view { display:none; }
+  .view.active { display:block; }
+
+  .btn { padding:0.65rem 1.2rem; border:none; border-radius:10px; cursor:pointer; font-size:0.92rem; font-weight:600; transition:all 0.2s; background:#f1f2f6; color:var(--text); }
+  .btn:hover { transform:translateY(-1px); }
+  .btn.primary { background:var(--primary); color:white; }
+  .btn.primary:hover { background:var(--primary-hover); }
+  .btn.danger { background:var(--danger); color:white; }
+  .btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+  /* Dashboard */
+  .dashboard-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.5rem; }
+  .dashboard-header h2 { font-size:1.6rem; }
+  .quiz-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1.25rem; }
+  .quiz-card { background:white; border:2px solid var(--border); border-radius:16px; padding:1.5rem; transition:all 0.2s; cursor:pointer; }
+  .quiz-card:hover { transform:translateY(-3px); box-shadow:0 10px 25px rgba(0,0,0,0.08); border-color:var(--primary); }
+  .quiz-card h3 { font-size:1.2rem; margin-bottom:0.4rem; }
+  .quiz-card p { color:var(--muted); font-size:0.9rem; margin-bottom:1rem; min-height:2.5em; }
+  .quiz-meta { font-size:0.8rem; color:var(--muted); margin-bottom:1rem; }
+  .quiz-actions { display:flex; gap:0.5rem; }
+  .quiz-actions .btn { flex:1; padding:0.5rem 0.7rem; font-size:0.82rem; }
+  .empty-state { text-align:center; padding:4rem 1rem; color:var(--muted); grid-column:1/-1; }
+  .empty-state .icon { font-size:4rem; margin-bottom:1rem; }
+
+  /* Create form */
+  .form-group { margin-bottom:1.25rem; }
+  .form-group label { display:block; margin-bottom:0.4rem; font-weight:600; color:var(--muted); font-size:0.9rem; }
+  .form-group input, .form-group textarea { width:100%; padding:0.7rem; border:2px solid var(--border); border-radius:10px; font-size:0.95rem; font-family:inherit; }
+  .form-group input:focus, .form-group textarea:focus { outline:none; border-color:var(--primary); }
+  .question-block { background:#f8f9fc; border:2px solid var(--border); border-radius:12px; padding:1.25rem; margin-bottom:1rem; }
+  .question-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+  .question-header span { font-weight:700; color:var(--primary); }
+  .option-row { display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem; }
+  .option-row input[type="radio"] { width:auto; cursor:pointer; accent-color:var(--primary); transform:scale(1.2); }
+  .option-row input[type="text"] { flex:1; padding:0.5rem; border:1px solid var(--border); border-radius:8px; }
+  .form-actions { display:flex; gap:0.75rem; margin-top:1.5rem; }
+  .form-actions .btn { flex:1; }
+
+  /* Game */
+  .game-container { background:white; border-radius:20px; padding:1.5rem; min-height:500px; box-shadow:0 5px 20px rgba(0,0,0,0.05); }
+  .game-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:0.5rem; }
+  .game-title { font-size:1.05rem; font-weight:700; }
+  .game-score { background:var(--primary); color:white; padding:0.4rem 1rem; border-radius:20px; font-weight:600; font-size:0.9rem; }
+  .progress-bar { background:#ecf0f1; height:10px; border-radius:5px; margin-bottom:1.5rem; overflow:hidden; }
+  .progress-fill { background:linear-gradient(90deg, var(--primary), #a29bfe); height:100%; transition:width 0.3s; }
+  .question-text { font-size:1.35rem; font-weight:600; margin-bottom:1.5rem; line-height:1.4; text-align:center; padding:1rem 0; }
+  .options-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; max-width:650px; margin:0 auto; }
+  .option-btn { background:#f8f9fc; border:3px solid var(--border); padding:1.1rem; border-radius:12px; cursor:pointer; font-size:1rem; text-align:left; transition:all 0.2s; font-weight:500; font-family:inherit; color:var(--text); }
+  .option-btn:hover:not(:disabled) { border-color:var(--primary); background:#f0f0ff; }
+  .option-btn.correct { border-color:var(--success); background:#d4f9e8; }
+  .option-btn.wrong { border-color:var(--danger); background:#fde8e8; }
+  .option-btn:disabled { cursor:default; }
+
+  /* Result */
+  .result-card { text-align:center; padding:2rem 1rem; }
+  .result-card .emoji { font-size:4rem; margin-bottom:1rem; }
+  .result-card h2 { margin-bottom:0.5rem; }
+  .result-card .score-big { font-size:3rem; font-weight:700; color:var(--primary); margin:1rem 0; }
+  .result-card .label { color:var(--muted); margin-bottom:1.5rem; }
+  .result-actions { display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap; }
+  .confetti { position:fixed; width:10px; height:14px; pointer-events:none; z-index:9999; }
+
+  @media (max-width:600px) {
+    header { padding:1rem; }
+    main { padding:1rem; }
+    .quiz-grid { grid-template-columns:1fr; }
+    .options-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-card">
+    <h1>Quizzes</h1>
+    <p class="subtitle">Sign in or create an account to play</p>
+    <div class="auth-tabs">
+      <div class="auth-tab active" data-mode="login" onclick="setAuthMode('login')">Login</div>
+      <div class="auth-tab" data-mode="signup" onclick="setAuthMode('signup')">Sign Up</div>
+    </div>
+    <form class="auth-form" id="auth-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="auth-email" placeholder="you@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="auth-password" placeholder="Your password" required>
+      </div>
+      <button type="submit" id="auth-submit">Login</button>
+      <p class="auth-error" id="auth-error"></p>
+    </form>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="app">
+  <header>
+    <div class="logo" onclick="showView('dashboard')">Quizzes</div>
+    <div class="user-area">
+      <div class="user-info">
+        <span>👤</span>
+        <strong id="user-email"></strong>
+        <span id="admin-badge" class="admin-badge">ADMIN</span>
+      </div>
+      <button class="btn primary" id="create-btn" onclick="startCreate()">+ Create Quiz</button>
+      <button class="btn" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="dashboard-view" class="view active">
+      <div class="dashboard-header"><h2>Quizzes</h2></div>
+      <div class="quiz-grid" id="quiz-grid"></div>
+    </section>
+
+    <section id="create-view" class="view">
+      <div class="dashboard-header">
+        <h2 id="create-title">Create New Quiz</h2>
+        <button class="btn" onclick="showView('dashboard')">&larr; Back</button>
+      </div>
+      <div class="form-group">
+        <label>Quiz Title</label>
+        <input type="text" id="quiz-title" placeholder="e.g. World Capitals">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="quiz-desc" placeholder="A short description of your quiz" rows="2"></textarea>
+      </div>
+      <div id="questions-container"></div>
+      <button class="btn" onclick="addQuestion()" style="margin-bottom:1rem;">+ Add Question</button>
+      <div class="form-actions">
+        <button class="btn" onclick="showView('dashboard')">Cancel</button>
+        <button class="btn primary" onclick="saveQuiz()">Save Quiz</button>
+      </div>
+    </section>
+
+    <section id="game-view" class="view">
+      <div class="game-container">
+        <div class="game-header">
+          <span class="game-title" id="game-title">Quiz</span>
+          <button class="btn" onclick="showView('dashboard')">&larr; Back</button>
+        </div>
+        <div id="game-body"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* CONFIG */
+const ADMIN_EMAIL = 'ibraheem.muhammad.ai@gmail.com';
+const ADMIN_PASSWORD = 'Midea@222';
+
+const USERS_KEY = 'quizzes_users';
+const DATA_KEY = 'quizzes_app_data';
+const SESSION_KEY = 'quizzes_session';
+
+/* STATE */
+let session = null;
+let quizzes = [];
+let editingId = null;
+let currentQuizId = null;
+let gameState = {};
+
+/* STORAGE */
+function getUsers() { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); }
+function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+function loadQuizzes() { quizzes = JSON.parse(localStorage.getItem(DATA_KEY) || '[]'); }
+function saveQuizzesToStorage() { localStorage.setItem(DATA_KEY, JSON.stringify(quizzes)); }
+
+/* AUTH */
+function isAdmin(email, password) {
+  return email === ADMIN_EMAIL && password === ADMIN_PASSWORD;
+}
+
+function setAuthMode(mode) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+  document.getElementById('auth-submit').textContent = mode === 'login' ? 'Login' : 'Sign Up';
+  document.getElementById('auth-error').textContent = '';
+}
+
+function handleAuth(e) {
+  e.preventDefault();
+  const email = document.getElementById('auth-email').value.trim().toLowerCase();
+  const password = document.getElementById('auth-password').value;
+  const errEl = document.getElementById('auth-error');
+  errEl.textContent = '';
+
+  if (!email || !password) { errEl.textContent = 'Please fill in both fields.'; return; }
+
+  if (isAdmin(email, password)) {
+    session = { email: ADMIN_EMAIL, isAdmin: true };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    showApp();
+    return;
+  }
+
+  if (document.querySelector('.auth-tab.active').dataset.mode === 'signup') {
+    if (email === ADMIN_EMAIL) {
+      errEl.textContent = 'This email is reserved for the admin. Please log in directly.';
+      return;
+    }
+    const users = getUsers();
+    if (users.find(u => u.email === email)) {
+      errEl.textContent = 'An account with this email already exists. Please log in.';
+      return;
+    }
+    users.push({ email, password: btoa(password), createdAt: Date.now() });
+    saveUsers(users);
+    session = { email, isAdmin: false };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    showApp();
+    return;
+  }
+
+  const users = getUsers();
+  const user = users.find(u => u.email === email && atob(u.password) === password);
+  if (!user) { errEl.textContent = 'Invalid email or password.'; return; }
+  session = { email: user.email, isAdmin: false };
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  showApp();
+}
+
+function logout() {
+  session = null;
+  localStorage.removeItem(SESSION_KEY);
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('auth-form').reset();
+  setAuthMode('login');
+}
+
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('user-email').textContent = session.email;
+  document.getElementById('admin-badge').style.display = session.isAdmin ? 'inline-block' : 'none';
+  document.getElementById('create-btn').style.display = session.isAdmin ? 'inline-block' : 'none';
+  loadQuizzes();
+  showView('dashboard');
+}
+
+/* VIEWS */
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(name + '-view').classList.add('active');
+  if (name === 'dashboard') renderDashboard();
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+
+/* DASHBOARD */
+function renderDashboard() {
+  const grid = document.getElementById('quiz-grid');
+  if (quizzes.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">📝</div><h3>No quizzes yet</h3><p>${session.isAdmin ? 'Click "+ Create Quiz" to make your first one!' : 'Check back soon for new quizzes!'}</p></div>`;
+    return;
+  }
+  grid.innerHTML = quizzes.map(q => `
+    <div class="quiz-card" onclick="playQuiz('${q.id}')">
+      <h3>${escapeHtml(q.title)}</h3>
+      <p>${escapeHtml(q.description || 'No description')}</p>
+      <div class="quiz-meta">${q.questions.length} questions &middot; ${new Date(q.createdAt).toLocaleDateString()}</div>
+      <div class="quiz-actions">
+        <button class="btn primary" onclick="event.stopPropagation();playQuiz('${q.id}')">Play</button>
+        ${session.isAdmin ? `
+          <button class="btn" onclick="event.stopPropagation();editQuiz('${q.id}')">Edit</button>
+          <button class="btn danger" onclick="event.stopPropagation();deleteQuiz('${q.id}')">Delete</button>
+        ` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+/* CREATE / EDIT / DELETE */
+function startCreate() {
+  if (!session.isAdmin) return;
+  editingId = null;
+  document.getElementById('create-title').textContent = 'Create New Quiz';
+  document.getElementById('quiz-title').value = '';
+  document.getElementById('quiz-desc').value = '';
+  document.getElementById('questions-container').innerHTML = '';
+  addQuestion();
+  showView('create');
+}
+
+function editQuiz(id) {
+  if (!session.isAdmin) return;
+  const q = quizzes.find(x => x.id === id);
+  if (!q) return;
+  editingId = id;
+  document.getElementById('create-title').textContent = 'Edit Quiz';
+  document.getElementById('quiz-title').value = q.title;
+  document.getElementById('quiz-desc').value = q.description || '';
+  document.getElementById('questions-container').innerHTML = '';
+  q.questions.forEach(pq => addQuestion(pq));
+  showView('create');
+}
+
+function deleteQuiz(id) {
+  if (!session.isAdmin) return;
+  if (!confirm('Delete this quiz permanently?')) return;
+  quizzes = quizzes.filter(q => q.id !== id);
+  saveQuizzesToStorage();
+  renderDashboard();
+}
+
+function addQuestion(prefilled = null) {
+  const container = document.getElementById('questions-container');
+  const idx = container.children.length;
+  const div = document.createElement('div');
+  div.className = 'question-block';
+  div.innerHTML = `
+    <div class="question-header">
+      <span>Question ${idx + 1}</span>
+      ${idx > 0 ? `<button class="btn danger" style="padding:0.3rem 0.7rem;font-size:0.78rem;" onclick="this.closest('.question-block').remove();renumberQuestions();">Remove</button>` : ''}
+    </div>
+    <div class="form-group">
+      <label>Question Text</label>
+      <input type="text" class="q-text" placeholder="Type your question" value="${prefilled ? escapeHtml(prefilled.text) : ''}">
+    </div>
+    <label>Options (select the correct answer)</label>
+    ${[0,1,2,3].map(i => `
+      <div class="option-row">
+        <input type="radio" name="correct-${idx}" value="${i}" ${prefilled && prefilled.correct === i ? 'checked' : ''}>
+        <input type="text" class="q-option" placeholder="Option ${i+1}" value="${prefilled ? escapeHtml(prefilled.options[i] || '') : ''}">
+      </div>
+    `).join('')}
+  `;
+  container.appendChild(div);
+}
+
+function renumberQuestions() {
+  document.querySelectorAll('#questions-container .question-block').forEach((block, i) => {
+    block.querySelector('.question-header span').textContent = `Question ${i + 1}`;
+    block.querySelectorAll('input[type="radio"]').forEach(r => r.name = `correct-${i}`);
+  });
+}
+
+function saveQuiz() {
+  if (!session.isAdmin) return;
+  const title = document.getElementById('quiz-title').value.trim();
+  const description = document.getElementById('quiz-desc').value.trim();
+  if (!title) { alert('Please enter a quiz title.'); return; }
+
+  const blocks = document.querySelectorAll('#questions-container .question-block');
+  const questions = [];
+  for (const block of blocks) {
+    const text = block.querySelector('.q-text').value.trim();
+    const options = Array.from(block.querySelectorAll('.q-option')).map(o => o.value.trim());
+    const correctRadio = block.querySelector('input[type="radio"]:checked');
+    if (!text) { alert('Please fill in all question texts.'); return; }
+    if (options.some(o => !o)) { alert('Please fill in all options.'); return; }
+    if (!correctRadio) { alert('Please select the correct answer for every question.'); return; }
+    questions.push({ text, options, correct: parseInt(correctRadio.value) });
+  }
+  if (questions.length === 0) { alert('Add at least one question.'); return; }
+
+  if (editingId) {
+    const i = quizzes.findIndex(q => q.id === editingId);
+    if (i > -1) quizzes[i] = { ...quizzes[i], title, description, questions, updatedAt: Date.now() };
+  } else {
+    quizzes.push({ id: 'quiz_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), title, description, questions, createdAt: Date.now() });
+  }
+  saveQuizzesToStorage();
+  showView('dashboard');
+}
+
+/* QUIZ GAME */
+function playQuiz(id) {
+  const q = quizzes.find(x => x.id === id);
+  if (!q) return;
+  currentQuizId = id;
+  document.getElementById('game-title').textContent = q.title;
+  showView('game');
+  startQuizMode(q);
+}
+
+function startQuizMode(quiz) {
+  gameState = { quiz, idx: 0, score: 0, answered: false };
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const { quiz, idx, score } = gameState;
+  const q = quiz.questions[idx];
+  const total = quiz.questions.length;
+  document.getElementById('game-body').innerHTML = `
+    <div class="progress-bar"><div class="progress-fill" style="width:${(idx/total)*100}%"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:1rem;font-size:0.9rem;color:var(--muted);">
+      <span>Question ${idx+1} / ${total}</span><span class="game-score">Score: ${score}</span>
+    </div>
+    <div class="question-text">${escapeHtml(q.text)}</div>
+    <div class="options-grid" id="options-grid">
+      ${q.options.map((opt, i) => `<button class="option-btn" onclick="quizAnswer(${i})">${escapeHtml(opt)}</button>`).join('')}
+    </div>
+  `;
+}
+
+function quizAnswer(i) {
+  if (gameState.answered) return;
+  gameState.answered = true;
+  const { quiz, idx } = gameState;
+  const q = quiz.questions[idx];
+  document.querySelectorAll('#options-grid .option-btn').forEach((btn, bidx) => {
+    btn.disabled = true;
+    if (bidx === q.correct) btn.classList.add('correct');
+    else if (bidx === i) btn.classList.add('wrong');
+  });
+  if (i === q.correct) gameState.score++;
+  setTimeout(() => {
+    gameState.idx++;
+    gameState.answered = false;
+    if (gameState.idx < quiz.questions.length) renderQuizQuestion();
+    else showResult(quiz);
+  }, 1400);
+}
+
+/* RESULT */
+function showResult(quiz) {
+  const score = gameState.score || 0;
+  const total = quiz.questions.length;
+  const pct = Math.round((score / total) * 100);
+  const emoji = pct === 100 ? '🏆' : pct >= 70 ? '🎉' : pct >= 40 ? '🙂' : '📚';
+  const msg = pct === 100 ? 'Perfect!' : pct >= 70 ? 'Great Job!' : pct >= 40 ? 'Good Effort!' : 'Keep Practicing!';
+  document.getElementById('game-body').innerHTML = `
+    <div class="result-card">
+      <div class="emoji">${emoji}</div>
+      <h2>${msg}</h2>
+      <div class="score-big">${score} / ${total}</div>
+      <div class="label">${pct}% correct</div>
+      <div class="result-actions">
+        <button class="btn primary" onclick="playQuiz('${quiz.id}')">Play Again</button>
+        <button class="btn" onclick="showView('dashboard')">Dashboard</button>
+      </div>
+    </div>
+  `;
+  if (pct >= 70) fireConfetti();
+}
+
+/* CONFETTI */
+function fireConfetti() {
+  const colors = ['#FF6B6B','#4ECDC4','#FFE66D','#A29BFE','#FF9F43','#55EFC4'];
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.top = '-15px';
+    const dx = (Math.random() - 0.5) * 250;
+    const dur = 2 + Math.random() * 2;
+    c.style.transition = `transform ${dur}s linear, opacity ${dur}s`;
+    document.body.appendChild(c);
+    setTimeout(() => {
+      c.style.transform = `translate(${dx}px, 110vh) rotate(${Math.random()*720}deg)`;
+      c.style.opacity = '0';
+    }, 10);
+    setTimeout(() => c.remove(), dur * 1000 + 200);
+  }
+}
+
+/* INIT */
+window.addEventListener('DOMContentLoaded', () => {
+  const s = localStorage.getItem(SESSION_KEY);
+  if (s) {
+    try { session = JSON.parse(s); } catch(e) { session = null; }
+  }
+  if (session) showApp();
+  else document.getElementById('auth-screen').style.display = 'flex';
+
+  document.getElementById('auth-form').addEventListener('submit', handleAuth);
+});
+</script>
+</body>
+</html>
