@@ -13,7 +13,7 @@
   }
   body { background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  /* Auth Screen */
+  /* Auth */
   .auth-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:1rem; background: linear-gradient(135deg, #667eea, #764ba2); }
   .auth-card { background:white; padding:2.5rem; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.2); width:100%; max-width:400px; }
   .auth-card h1 { text-align:center; font-size:2rem; margin-bottom:0.3rem; background:linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
@@ -53,10 +53,16 @@
   /* Dashboard */
   .dashboard-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.5rem; }
   .dashboard-header h2 { font-size:1.6rem; }
-  .quiz-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1.25rem; }
+  .quiz-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:1.25rem; }
   .quiz-card { background:white; border:2px solid var(--border); border-radius:16px; padding:1.5rem; transition:all 0.2s; cursor:pointer; }
   .quiz-card:hover { transform:translateY(-3px); box-shadow:0 10px 25px rgba(0,0,0,0.08); border-color:var(--primary); }
-  .quiz-card h3 { font-size:1.2rem; margin-bottom:0.4rem; }
+  .quiz-card-header { display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; margin-bottom:0.4rem; }
+  .quiz-card h3 { font-size:1.2rem; }
+  .tpl-badge { font-size:0.7rem; padding:0.25rem 0.55rem; border-radius:20px; font-weight:600; white-space:nowrap; }
+  .tpl-badge.tpl-quiz { background:#e0f7f5; color:#00897b; }
+  .tpl-badge.tpl-scramble { background:#fff3e0; color:#e65100; }
+  .tpl-badge.tpl-type { background:#ede7f6; color:#4527a0; }
+  .tpl-badge.tpl-maze { background:#fce4ec; color:#c2185b; }
   .quiz-card p { color:var(--muted); font-size:0.9rem; margin-bottom:1rem; min-height:2.5em; }
   .quiz-meta { font-size:0.8rem; color:var(--muted); margin-bottom:1rem; }
   .quiz-actions { display:flex; gap:0.5rem; }
@@ -78,6 +84,15 @@
   .form-actions { display:flex; gap:0.75rem; margin-top:1.5rem; }
   .form-actions .btn { flex:1; }
 
+  /* Template picker */
+  .template-picker { display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; }
+  .template-card { background:#f8f9fc; border:2px solid var(--border); border-radius:12px; padding:1rem 0.5rem; text-align:center; cursor:pointer; transition:all 0.15s; user-select:none; }
+  .template-card:hover { border-color:var(--primary); }
+  .template-card.selected { border-color:var(--primary); background:#f0f0ff; box-shadow:0 4px 12px rgba(108,92,231,0.15); }
+  .template-card .icon { font-size:1.8rem; margin-bottom:0.3rem; }
+  .template-card strong { display:block; font-size:0.88rem; margin-bottom:0.2rem; }
+  .template-card small { color:var(--muted); font-size:0.72rem; }
+
   /* Game */
   .game-container { background:white; border-radius:20px; padding:1.5rem; min-height:500px; box-shadow:0 5px 20px rgba(0,0,0,0.05); }
   .game-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:0.5rem; }
@@ -93,6 +108,127 @@
   .option-btn.wrong { border-color:var(--danger); background:#fde8e8; }
   .option-btn:disabled { cursor:default; }
 
+  /* Word Scramble */
+  .scramble-question { text-align:center; font-size:1.25rem; margin-bottom:1rem; padding:1rem; background:#f8f9fc; border-radius:12px; font-weight:600; }
+  .scramble-hint { text-align:center; color:var(--muted); font-size:0.85rem; margin-bottom:1rem; }
+  .scramble-answer { display:flex; flex-wrap:wrap; gap:0.4rem; justify-content:center; min-height:55px; padding:1rem; border:2px dashed var(--border); border-radius:10px; margin-bottom:1.5rem; align-items:center; transition:all 0.2s; }
+  .scramble-answer .placeholder { color:#bbb; font-size:0.9rem; }
+  .scramble-tile { background:var(--primary); color:white; min-width:40px; height:40px; padding:0 0.4rem; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:1.2rem; font-weight:700; cursor:pointer; transition:all 0.15s; user-select:none; }
+  .scramble-tile:hover { transform:scale(1.05); }
+  .scramble-tile.used { opacity:0.25; cursor:default; transform:none; }
+  .scramble-pool { display:flex; flex-wrap:wrap; gap:0.4rem; justify-content:center; }
+  .scramble-pool .scramble-tile { background:#f1f2f6; color:var(--text); }
+
+  /* Type the Answer */
+  .type-question { font-size:1.35rem; font-weight:600; margin-bottom:1.5rem; line-height:1.4; text-align:center; padding:1rem 0; }
+  .type-input-wrap { display:flex; gap:0.5rem; max-width:500px; margin:0 auto; }
+  .type-input-wrap input { flex:1; padding:0.9rem 1rem; border:2px solid var(--border); border-radius:10px; font-size:1rem; font-family:inherit; }
+  .type-input-wrap input:focus { outline:none; border-color:var(--primary); }
+  .type-input-wrap input:disabled { background:#f8f9fc; }
+  #type-feedback { text-align:center; margin-top:1.5rem; min-height:2rem; }
+  .type-correct { color:var(--success); font-size:1.2rem; font-weight:600; }
+  .type-wrong { color:var(--danger); font-size:1.05rem; }
+  .type-wrong strong { color:var(--text); }
+  #scramble-feedback { text-align:center; margin-top:1rem; min-height:1.5rem; }
+
+  /* ===== Maze Runner (different dark neon style) ===== */
+  .maze-game {
+    background: linear-gradient(135deg, #0f0f1e, #1a1a2e);
+    border-radius: 12px;
+    padding: 1.25rem;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    margin-top: 1rem;
+  }
+  .maze-question {
+    text-align: center;
+    font-size: 1.05rem;
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+    background: #16213e;
+    border-radius: 8px;
+    color: #00ffc8;
+    border: 1px solid #00ffc8;
+    line-height: 1.4;
+  }
+  .maze-question strong { color: #fff; }
+  .maze-grid {
+    display: grid;
+    gap: 3px;
+    background: #16213e;
+    padding: 8px;
+    border-radius: 8px;
+    margin: 0 auto;
+    max-width: 480px;
+    border: 1px solid #30475e;
+  }
+  .maze-cell {
+    aspect-ratio: 1;
+    background: #16213e;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 2px;
+    position: relative;
+    color: white;
+    overflow: hidden;
+    transition: all 0.15s;
+  }
+  .maze-cell.wall {
+    background: #0f3460;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
+  }
+  .maze-cell.player {
+    background: #00ffc8;
+    color: #16213e;
+    box-shadow: 0 0 18px #00ffc8;
+    font-size: 1.2rem;
+    animation: playerPulse 1s ease-in-out infinite;
+  }
+  @keyframes playerPulse { 0%,100%{box-shadow:0 0 15px #00ffc8;} 50%{box-shadow:0 0 25px #00ffc8;} }
+  .maze-cell.option {
+    background: #e94560;
+    color: white;
+    box-shadow: 0 0 8px rgba(233,69,96,0.5);
+  }
+  .maze-cell.option:hover { transform: scale(1.03); }
+  .maze-cell.flash-correct {
+    background: #00ffc8 !important;
+    color: #16213e !important;
+    box-shadow: 0 0 25px #00ffc8 !important;
+  }
+  .maze-cell.flash-wrong {
+    background: #ff4444 !important;
+    color: white !important;
+    box-shadow: 0 0 20px #ff4444 !important;
+  }
+  .maze-dpad {
+    display: grid;
+    grid-template-columns: repeat(3, 56px);
+    grid-template-rows: repeat(3, 56px);
+    gap: 4px;
+    margin: 1.25rem auto 0.5rem;
+    width: max-content;
+  }
+  .maze-dpad button {
+    background: #16213e;
+    color: #00ffc8;
+    border: 2px solid #00ffc8;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.1s;
+  }
+  .maze-dpad button:hover { background: #00ffc8; color: #16213e; }
+  .maze-dpad button:active { transform: scale(0.95); }
+  .maze-dpad .spacer { visibility: hidden; }
+  .maze-help { text-align:center; color:#888; font-size:0.78rem; margin-top:0.5rem; font-family: 'Segoe UI', sans-serif; }
+
   /* Result */
   .result-card { text-align:center; padding:2rem 1rem; }
   .result-card .emoji { font-size:4rem; margin-bottom:1rem; }
@@ -107,6 +243,10 @@
     main { padding:1rem; }
     .quiz-grid { grid-template-columns:1fr; }
     .options-grid { grid-template-columns:1fr; }
+    .template-picker { grid-template-columns:1fr 1fr; }
+    .type-input-wrap { flex-direction:column; }
+    .maze-grid { max-width: 100%; }
+    .maze-cell { font-size: 0.6rem; }
   }
 </style>
 </head>
@@ -170,8 +310,25 @@
         <label>Description</label>
         <textarea id="quiz-desc" placeholder="A short description of your quiz" rows="2"></textarea>
       </div>
+      <div class="form-group">
+        <label>Template (choose how this quiz will be played)</label>
+        <div class="template-picker" id="template-picker">
+          <div class="template-card selected" data-template="quiz" onclick="selectTemplate('quiz')">
+            <div class="icon">❓</div><strong>Quiz</strong><small>Multiple choice</small>
+          </div>
+          <div class="template-card" data-template="scramble" onclick="selectTemplate('scramble')">
+            <div class="icon">🔤</div><strong>Word Scramble</strong><small>Unscramble answer</small>
+          </div>
+          <div class="template-card" data-template="type" onclick="selectTemplate('type')">
+            <div class="icon">⌨️</div><strong>Type the Answer</strong><small>Type your answer</small>
+          </div>
+          <div class="template-card" data-template="maze" onclick="selectTemplate('maze')">
+            <div class="icon">🌀</div><strong>Maze Runner</strong><small>Navigate to the answer</small>
+          </div>
+        </div>
+      </div>
       <div id="questions-container"></div>
-      <button class="btn" onclick="addQuestion()" style="margin-bottom:1rem;">+ Add Question</button>
+      <button class="btn" onclick="addQuestionForTemplate(selectedTemplate)" style="margin-bottom:1rem;">+ Add Question</button>
       <div class="form-actions">
         <button class="btn" onclick="showView('dashboard')">Cancel</button>
         <button class="btn primary" onclick="saveQuiz()">Save Quiz</button>
@@ -191,7 +348,7 @@
 </div>
 
 <script>
-/* CONFIG */
+/* ===== CONFIG ===== */
 const ADMIN_EMAIL = 'ibraheem.muhammad.ai@gmail.com';
 const ADMIN_PASSWORD = 'Midea@222';
 
@@ -199,64 +356,59 @@ const USERS_KEY = 'quizzes_users';
 const DATA_KEY = 'quizzes_app_data';
 const SESSION_KEY = 'quizzes_session';
 
-/* STATE */
+/* ===== TEMPLATES ===== */
+const MODES = [
+  { id: 'quiz',     icon: '❓', name: 'Quiz',            desc: 'Multiple choice' },
+  { id: 'scramble', icon: '🔤', name: 'Word Scramble',   desc: 'Unscramble answer' },
+  { id: 'type',     icon: '⌨️', name: 'Type the Answer', desc: 'Type your answer' },
+  { id: 'maze',     icon: '🌀', name: 'Maze Runner',     desc: 'Navigate to the answer' }
+];
+function modeName(id) { return MODES.find(m => m.id === id)?.name || 'Quiz'; }
+
+/* ===== STATE ===== */
 let session = null;
 let quizzes = [];
 let editingId = null;
 let currentQuizId = null;
+let currentMode = null;
+let selectedTemplate = 'quiz';
 let gameState = {};
 
-/* STORAGE */
+/* ===== STORAGE ===== */
 function getUsers() { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); }
 function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
 function loadQuizzes() { quizzes = JSON.parse(localStorage.getItem(DATA_KEY) || '[]'); }
 function saveQuizzesToStorage() { localStorage.setItem(DATA_KEY, JSON.stringify(quizzes)); }
 
-/* AUTH */
-function isAdmin(email, password) {
-  return email === ADMIN_EMAIL && password === ADMIN_PASSWORD;
-}
-
+/* ===== AUTH ===== */
+function isAdmin(email, password) { return email === ADMIN_EMAIL && password === ADMIN_PASSWORD; }
 function setAuthMode(mode) {
   document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
   document.getElementById('auth-submit').textContent = mode === 'login' ? 'Login' : 'Sign Up';
   document.getElementById('auth-error').textContent = '';
 }
-
 function handleAuth(e) {
   e.preventDefault();
   const email = document.getElementById('auth-email').value.trim().toLowerCase();
   const password = document.getElementById('auth-password').value;
   const errEl = document.getElementById('auth-error');
   errEl.textContent = '';
-
   if (!email || !password) { errEl.textContent = 'Please fill in both fields.'; return; }
-
   if (isAdmin(email, password)) {
     session = { email: ADMIN_EMAIL, isAdmin: true };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    showApp();
-    return;
+    showApp(); return;
   }
-
   if (document.querySelector('.auth-tab.active').dataset.mode === 'signup') {
-    if (email === ADMIN_EMAIL) {
-      errEl.textContent = 'This email is reserved for the admin. Please log in directly.';
-      return;
-    }
+    if (email === ADMIN_EMAIL) { errEl.textContent = 'This email is reserved for the admin. Please log in directly.'; return; }
     const users = getUsers();
-    if (users.find(u => u.email === email)) {
-      errEl.textContent = 'An account with this email already exists. Please log in.';
-      return;
-    }
+    if (users.find(u => u.email === email)) { errEl.textContent = 'An account with this email already exists. Please log in.'; return; }
     users.push({ email, password: btoa(password), createdAt: Date.now() });
     saveUsers(users);
     session = { email, isAdmin: false };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    showApp();
-    return;
+    showApp(); return;
   }
-
   const users = getUsers();
   const user = users.find(u => u.email === email && atob(u.password) === password);
   if (!user) { errEl.textContent = 'Invalid email or password.'; return; }
@@ -264,16 +416,14 @@ function handleAuth(e) {
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
   showApp();
 }
-
 function logout() {
-  session = null;
+  session = null; currentMode = null;
   localStorage.removeItem(SESSION_KEY);
   document.getElementById('app').classList.remove('visible');
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('auth-form').reset();
   setAuthMode('login');
 }
-
 function showApp() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
@@ -284,43 +434,118 @@ function showApp() {
   showView('dashboard');
 }
 
-/* VIEWS */
+/* ===== VIEWS ===== */
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(name + '-view').classList.add('active');
-  if (name === 'dashboard') renderDashboard();
+  if (name === 'dashboard') { currentMode = null; renderDashboard(); }
 }
-
 function escapeHtml(s) {
   const d = document.createElement('div');
   d.textContent = s == null ? '' : String(s);
   return d.innerHTML;
 }
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
-/* DASHBOARD */
+/* ===== DASHBOARD ===== */
 function renderDashboard() {
   const grid = document.getElementById('quiz-grid');
   if (quizzes.length === 0) {
     grid.innerHTML = `<div class="empty-state"><div class="icon">📝</div><h3>No quizzes yet</h3><p>${session.isAdmin ? 'Click "+ Create Quiz" to make your first one!' : 'Check back soon for new quizzes!'}</p></div>`;
     return;
   }
-  grid.innerHTML = quizzes.map(q => `
-    <div class="quiz-card" onclick="playQuiz('${q.id}')">
-      <h3>${escapeHtml(q.title)}</h3>
-      <p>${escapeHtml(q.description || 'No description')}</p>
-      <div class="quiz-meta">${q.questions.length} questions &middot; ${new Date(q.createdAt).toLocaleDateString()}</div>
-      <div class="quiz-actions">
-        <button class="btn primary" onclick="event.stopPropagation();playQuiz('${q.id}')">Play</button>
-        ${session.isAdmin ? `
-          <button class="btn" onclick="event.stopPropagation();editQuiz('${q.id}')">Edit</button>
-          <button class="btn danger" onclick="event.stopPropagation();deleteQuiz('${q.id}')">Delete</button>
-        ` : ''}
+  grid.innerHTML = quizzes.map(q => {
+    const tpl = q.template || 'quiz';
+    const tplInfo = MODES.find(m => m.id === tpl) || MODES[0];
+    return `
+      <div class="quiz-card" onclick="playQuiz('${q.id}')">
+        <div class="quiz-card-header">
+          <h3>${escapeHtml(q.title)}</h3>
+          <span class="tpl-badge tpl-${tpl}">${tplInfo.icon} ${tplInfo.name}</span>
+        </div>
+        <p>${escapeHtml(q.description || 'No description')}</p>
+        <div class="quiz-meta">${q.questions.length} questions &middot; ${new Date(q.createdAt).toLocaleDateString()}</div>
+        <div class="quiz-actions">
+          <button class="btn primary" onclick="event.stopPropagation();playQuiz('${q.id}')">Play</button>
+          ${session.isAdmin ? `
+            <button class="btn" onclick="event.stopPropagation();editQuiz('${q.id}')">Edit</button>
+            <button class="btn danger" onclick="event.stopPropagation();deleteQuiz('${q.id}')">Delete</button>
+          ` : ''}
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
-/* CREATE / EDIT / DELETE */
+/* ===== CREATE / EDIT / DELETE ===== */
+function selectTemplate(t) {
+  // Capture current questions before switching
+  const currentQs = captureQuestionsFromDOM();
+  selectedTemplate = t;
+  document.querySelectorAll('.template-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.template === t);
+  });
+  // Convert & re-render questions in new format
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  const converted = currentQs.map(q => convertQuestion(q, t));
+  if (converted.length === 0) {
+    addQuestionForTemplate(t);
+  } else {
+    converted.forEach(q => addQuestionForTemplate(t, q));
+  }
+}
+
+function captureQuestionsFromDOM() {
+  const blocks = document.querySelectorAll('#questions-container .question-block');
+  const qs = [];
+  for (const block of blocks) {
+    const text = block.querySelector('.q-text')?.value.trim() || '';
+    if (selectedTemplate === 'scramble') {
+      const answerInput = block.querySelector('.q-answer');
+      const answer = answerInput ? answerInput.value.trim() : '';
+      qs.push({ text, answer });
+    } else {
+      const options = Array.from(block.querySelectorAll('.q-option')).map(o => o.value.trim());
+      const correctRadio = block.querySelector('input[type="radio"]:checked');
+      const correct = correctRadio ? parseInt(correctRadio.value) : 0;
+      qs.push({ text, options, correct });
+    }
+  }
+  return qs;
+}
+
+function convertQuestion(q, targetTemplate) {
+  if (targetTemplate === 'scramble') {
+    // Need { text, answer }
+    let answer = q.answer || '';
+    if (!answer && q.options && q.options.length > 0) {
+      answer = q.options[q.correct] || q.options[0] || '';
+    }
+    return { text: q.text, answer };
+  } else {
+    // Need { text, options[4], correct }
+    if (q.options && q.options.length >= 4) {
+      return { text: q.text, options: q.options, correct: q.correct || 0 };
+    } else if (q.answer) {
+      return { text: q.text, options: [q.answer, '', '', ''], correct: 0 };
+    } else {
+      return { text: q.text, options: ['', '', '', ''], correct: 0 };
+    }
+  }
+}
+
+function addQuestionForTemplate(template, prefilled = null) {
+  if (template === 'scramble') addScrambleQuestion(prefilled);
+  else addQuestion(prefilled);
+}
+
 function startCreate() {
   if (!session.isAdmin) return;
   editingId = null;
@@ -328,6 +553,10 @@ function startCreate() {
   document.getElementById('quiz-title').value = '';
   document.getElementById('quiz-desc').value = '';
   document.getElementById('questions-container').innerHTML = '';
+  selectedTemplate = 'quiz';
+  document.querySelectorAll('.template-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.template === 'quiz');
+  });
   addQuestion();
   showView('create');
 }
@@ -341,7 +570,12 @@ function editQuiz(id) {
   document.getElementById('quiz-title').value = q.title;
   document.getElementById('quiz-desc').value = q.description || '';
   document.getElementById('questions-container').innerHTML = '';
-  q.questions.forEach(pq => addQuestion(pq));
+  const tpl = q.template || 'quiz';
+  selectedTemplate = tpl;
+  document.querySelectorAll('.template-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.template === tpl);
+  });
+  q.questions.forEach(pq => addQuestionForTemplate(tpl, pq));
   showView('create');
 }
 
@@ -353,6 +587,7 @@ function deleteQuiz(id) {
   renderDashboard();
 }
 
+/* Standard question block (quiz / type / maze templates) */
 function addQuestion(prefilled = null) {
   const container = document.getElementById('questions-container');
   const idx = container.children.length;
@@ -371,9 +606,32 @@ function addQuestion(prefilled = null) {
     ${[0,1,2,3].map(i => `
       <div class="option-row">
         <input type="radio" name="correct-${idx}" value="${i}" ${prefilled && prefilled.correct === i ? 'checked' : ''}>
-        <input type="text" class="q-option" placeholder="Option ${i+1}" value="${prefilled ? escapeHtml(prefilled.options[i] || '') : ''}">
+        <input type="text" class="q-option" placeholder="Option ${i+1}" value="${prefilled && prefilled.options ? escapeHtml(prefilled.options[i] || '') : ''}">
       </div>
     `).join('')}
+  `;
+  container.appendChild(div);
+}
+
+/* Scramble question block — just question + correct answer */
+function addScrambleQuestion(prefilled = null) {
+  const container = document.getElementById('questions-container');
+  const idx = container.children.length;
+  const div = document.createElement('div');
+  div.className = 'question-block';
+  div.innerHTML = `
+    <div class="question-header">
+      <span>Question ${idx + 1}</span>
+      ${idx > 0 ? `<button class="btn danger" style="padding:0.3rem 0.7rem;font-size:0.78rem;" onclick="this.closest('.question-block').remove();renumberQuestions();">Remove</button>` : ''}
+    </div>
+    <div class="form-group">
+      <label>Question Text</label>
+      <input type="text" class="q-text" placeholder="Type your question" value="${prefilled ? escapeHtml(prefilled.text) : ''}">
+    </div>
+    <div class="form-group">
+      <label>Correct Answer</label>
+      <input type="text" class="q-answer" placeholder="The word players must unscramble" value="${prefilled && prefilled.answer ? escapeHtml(prefilled.answer) : ''}">
+    </div>
   `;
   container.appendChild(div);
 }
@@ -393,42 +651,58 @@ function saveQuiz() {
 
   const blocks = document.querySelectorAll('#questions-container .question-block');
   const questions = [];
-  for (const block of blocks) {
-    const text = block.querySelector('.q-text').value.trim();
-    const options = Array.from(block.querySelectorAll('.q-option')).map(o => o.value.trim());
-    const correctRadio = block.querySelector('input[type="radio"]:checked');
-    if (!text) { alert('Please fill in all question texts.'); return; }
-    if (options.some(o => !o)) { alert('Please fill in all options.'); return; }
-    if (!correctRadio) { alert('Please select the correct answer for every question.'); return; }
-    questions.push({ text, options, correct: parseInt(correctRadio.value) });
+
+  if (selectedTemplate === 'scramble') {
+    for (const block of blocks) {
+      const text = block.querySelector('.q-text').value.trim();
+      const answer = block.querySelector('.q-answer').value.trim();
+      if (!text) { alert('Please fill in all question texts.'); return; }
+      if (!answer) { alert('Please fill in the correct answer for every question.'); return; }
+      questions.push({ text, answer });
+    }
+  } else {
+    for (const block of blocks) {
+      const text = block.querySelector('.q-text').value.trim();
+      const options = Array.from(block.querySelectorAll('.q-option')).map(o => o.value.trim());
+      const correctRadio = block.querySelector('input[type="radio"]:checked');
+      if (!text) { alert('Please fill in all question texts.'); return; }
+      if (options.some(o => !o)) { alert('Please fill in all options.'); return; }
+      if (!correctRadio) { alert('Please select the correct answer for every question.'); return; }
+      questions.push({ text, options, correct: parseInt(correctRadio.value) });
+    }
   }
   if (questions.length === 0) { alert('Add at least one question.'); return; }
 
   if (editingId) {
     const i = quizzes.findIndex(q => q.id === editingId);
-    if (i > -1) quizzes[i] = { ...quizzes[i], title, description, questions, updatedAt: Date.now() };
+    if (i > -1) quizzes[i] = { ...quizzes[i], title, description, template: selectedTemplate, questions, updatedAt: Date.now() };
   } else {
-    quizzes.push({ id: 'quiz_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), title, description, questions, createdAt: Date.now() });
+    quizzes.push({ id: 'quiz_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), title, description, template: selectedTemplate, questions, createdAt: Date.now() });
   }
   saveQuizzesToStorage();
   showView('dashboard');
 }
 
-/* QUIZ GAME */
+/* ===== PLAY ===== */
 function playQuiz(id) {
   const q = quizzes.find(x => x.id === id);
   if (!q) return;
   currentQuizId = id;
-  document.getElementById('game-title').textContent = q.title;
+  const tpl = q.template || 'quiz';
+  currentMode = tpl;
+  document.getElementById('game-title').textContent = q.title + ' · ' + modeName(tpl);
   showView('game');
-  startQuizMode(q);
+  if (tpl === 'scramble')      startScramble(q);
+  else if (tpl === 'type')     startType(q);
+  else if (tpl === 'maze')     startMaze(q);
+  else                         startQuizMode(q);
 }
 
+/* ===== TEMPLATE 1: QUIZ ===== */
 function startQuizMode(quiz) {
   gameState = { quiz, idx: 0, score: 0, answered: false };
   renderQuizQuestion();
 }
-
 function renderQuizQuestion() {
   const { quiz, idx, score } = gameState;
   const q = quiz.questions[idx];
@@ -444,7 +718,6 @@ function renderQuizQuestion() {
     </div>
   `;
 }
-
 function quizAnswer(i) {
   if (gameState.answered) return;
   gameState.answered = true;
@@ -464,7 +737,362 @@ function quizAnswer(i) {
   }, 1400);
 }
 
-/* RESULT */
+/* ===== TEMPLATE 2: WORD SCRAMBLE (with distractor letters) ===== */
+function getScrambleAnswer(q) {
+  if (q.answer) return q.answer;
+  if (q.options && q.correct != null) return q.options[q.correct] || '';
+  return '';
+}
+function startScramble(quiz) {
+  gameState = { quiz, idx: 0, score: 0 };
+  renderScramble();
+}
+function renderScramble() {
+  const { quiz, idx, score } = gameState;
+  const q = quiz.questions[idx];
+  const answer = getScrambleAnswer(q);
+  const answerLetters = answer.replace(/\s+/g, '').toUpperCase().split('');
+
+  // Generate distractor letters (not in answer)
+  const usedSet = new Set(answerLetters);
+  const numDistractors = Math.max(3, Math.ceil(answerLetters.length / 2));
+  const distractors = [];
+  while (distractors.length < numDistractors) {
+    const c = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    if (!usedSet.has(c)) { distractors.push(c); usedSet.add(c); }
+  }
+
+  const allLetters = shuffle([...answerLetters, ...distractors]);
+  gameState.allLetters = allLetters;
+  gameState.targetAnswer = answerLetters.join('');
+  gameState.used = allLetters.map(() => false);
+  gameState.built = [];
+  gameState.answered = false;
+
+  document.getElementById('game-body').innerHTML = `
+    <div class="progress-bar"><div class="progress-fill" style="width:${(idx/quiz.questions.length)*100}%"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:1rem;font-size:0.9rem;color:var(--muted);">
+      <span>Word ${idx+1} / ${quiz.questions.length}</span><span class="game-score">Score: ${score}</span>
+    </div>
+    <div class="scramble-question">${escapeHtml(q.text)}</div>
+    <div class="scramble-hint">Pick only the letters that spell the answer — wrong letters are mixed in!</div>
+    <div class="scramble-answer" id="scramble-answer"></div>
+    <div class="scramble-pool" id="scramble-pool">
+      ${allLetters.map((l, i) => `<div class="scramble-tile" onclick="pickLetter(${i})" data-letter-idx="${i}">${l}</div>`).join('')}
+    </div>
+    <div style="text-align:center;margin-top:1.5rem;display:flex;gap:0.5rem;justify-content:center;">
+      <button class="btn" onclick="clearScramble()">Clear</button>
+      <button class="btn primary" onclick="checkScramble()">Check</button>
+    </div>
+    <div id="scramble-feedback"></div>
+  `;
+  renderScrambleBuilt();
+}
+function renderScrambleBuilt() {
+  const ans = document.getElementById('scramble-answer');
+  ans.innerHTML = gameState.built.length
+    ? gameState.built.map((l, i) => `<div class="scramble-tile" onclick="unpickLetter(${i})">${l}</div>`).join('')
+    : '<span class="placeholder">Tap letters below to build the answer</span>';
+  document.querySelectorAll('#scramble-pool .scramble-tile').forEach((tile, i) => {
+    tile.classList.toggle('used', gameState.used[i]);
+  });
+}
+function pickLetter(i) {
+  if (gameState.used[i] || gameState.answered) return;
+  gameState.used[i] = true;
+  gameState.built.push(gameState.allLetters[i]);
+  renderScrambleBuilt();
+}
+function unpickLetter(builtIdx) {
+  if (gameState.answered) return;
+  const letter = gameState.built[builtIdx];
+  for (let i = 0; i < gameState.allLetters.length; i++) {
+    if (gameState.allLetters[i] === letter && gameState.used[i]) { gameState.used[i] = false; break; }
+  }
+  gameState.built.splice(builtIdx, 1);
+  renderScrambleBuilt();
+}
+function clearScramble() {
+  if (gameState.answered) return;
+  gameState.used = gameState.allLetters.map(() => false);
+  gameState.built = [];
+  renderScrambleBuilt();
+}
+function checkScramble() {
+  if (gameState.answered) return;
+  if (gameState.built.length === 0) return;
+  gameState.answered = true;
+  const { targetAnswer, built } = gameState;
+  const guess = built.join('');
+  const correct = guess === targetAnswer;
+  if (correct) gameState.score++;
+  const ans = document.getElementById('scramble-answer');
+  const fb = document.getElementById('scramble-feedback');
+  ans.style.background = correct ? '#d4f9e8' : '#fde8e8';
+  ans.style.borderColor = correct ? '#00b894' : '#d63031';
+  fb.innerHTML = correct
+    ? `<span class="type-correct">✓ Correct!</span>`
+    : `<span class="type-wrong">✗ The answer was: <strong>${escapeHtml(targetAnswer)}</strong></span>`;
+  setTimeout(() => {
+    gameState.idx++;
+    gameState.answered = false;
+    if (gameState.idx < gameState.quiz.questions.length) renderScramble();
+    else showResult(gameState.quiz);
+  }, 1900);
+}
+
+/* ===== TEMPLATE 3: TYPE THE ANSWER ===== */
+function startType(quiz) {
+  gameState = { quiz, idx: 0, score: 0 };
+  renderType();
+}
+function renderType() {
+  const { quiz, idx, score } = gameState;
+  const q = quiz.questions[idx];
+  document.getElementById('game-body').innerHTML = `
+    <div class="progress-bar"><div class="progress-fill" style="width:${(idx/quiz.questions.length)*100}%"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:1rem;font-size:0.9rem;color:var(--muted);">
+      <span>Question ${idx+1} / ${quiz.questions.length}</span><span class="game-score">Score: ${score}</span>
+    </div>
+    <div class="type-question">${escapeHtml(q.text)}</div>
+    <div class="type-input-wrap">
+      <input type="text" id="type-input" placeholder="Type your answer here..." autocomplete="off">
+      <button class="btn primary" onclick="checkType()">Check</button>
+    </div>
+    <div id="type-feedback"></div>
+  `;
+  const input = document.getElementById('type-input');
+  input.focus();
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkType(); });
+}
+function checkType() {
+  if (gameState.answered) return;
+  const input = document.getElementById('type-input');
+  const guess = input.value.trim();
+  if (!guess) return;
+  gameState.answered = true;
+  const { quiz, idx } = gameState;
+  const q = quiz.questions[idx];
+  const normalize = (s) => s.trim().toLowerCase().replace(/\s+/g, ' ');
+  const correct = normalize(guess) === normalize(q.options[q.correct]);
+  if (correct) gameState.score++;
+  input.disabled = true;
+  document.getElementById('type-feedback').innerHTML = correct
+    ? `<div class="type-correct">✓ Correct!</div>`
+    : `<div class="type-wrong">✗ The correct answer was: <strong>${escapeHtml(q.options[q.correct])}</strong></div>`;
+  setTimeout(() => {
+    gameState.idx++;
+    gameState.answered = false;
+    if (gameState.idx < quiz.questions.length) renderType();
+    else showResult(quiz);
+  }, 2000);
+}
+
+/* ===== TEMPLATE 4: MAZE RUNNER (dark neon style) ===== */
+function startMaze(quiz) {
+  gameState = { quiz, idx: 0, score: 0, gridSize: 6 };
+  renderMaze();
+}
+function renderMaze() {
+  const { quiz, idx, score, gridSize } = gameState;
+  const q = quiz.questions[idx];
+  const total = quiz.questions.length;
+
+  let grid;
+  let attempts = 0;
+  do {
+    grid = generateMazeGrid(gridSize, q);
+    attempts++;
+  } while (!isMazeReachable(grid, gridSize) && attempts < 10);
+  gameState.grid = grid;
+  gameState.playerPos = { r: Math.floor(gridSize/2), c: Math.floor(gridSize/2) };
+  gameState.answered = false;
+  grid[gameState.playerPos.r][gameState.playerPos.c].player = true;
+
+  document.getElementById('game-body').innerHTML = `
+    <div class="progress-bar"><div class="progress-fill" style="width:${(idx/total)*100}%"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:1rem;font-size:0.9rem;color:var(--muted);">
+      <span>Question ${idx+1} / ${total}</span><span class="game-score">Score: ${score}</span>
+    </div>
+    <div class="maze-game">
+      <div class="maze-question">Find the answer to: <strong>${escapeHtml(q.text)}</strong></div>
+      <div class="maze-grid" id="maze-grid" style="grid-template-columns:repeat(${gridSize},1fr);"></div>
+      <div class="maze-dpad">
+        <div class="spacer"></div>
+        <button onclick="movePlayer(-1,0)">↑</button>
+        <div class="spacer"></div>
+        <button onclick="movePlayer(0,-1)">←</button>
+        <div class="spacer"></div>
+        <button onclick="movePlayer(0,1)">→</button>
+        <div class="spacer"></div>
+        <button onclick="movePlayer(1,0)">↓</button>
+        <div class="spacer"></div>
+      </div>
+      <p class="maze-help">Use arrow keys / WASD or the dpad. Step on the colored tile with the correct answer. Wrong tiles cost 1 point.</p>
+    </div>
+  `;
+  drawMazeGrid();
+}
+function generateMazeGrid(size, q) {
+  const grid = [];
+  for (let r = 0; r < size; r++) {
+    grid[r] = [];
+    for (let c = 0; c < size; c++) {
+      grid[r][c] = { wall: false, option: null, player: false };
+    }
+  }
+  // Add some walls (not in center)
+  const center = Math.floor(size/2);
+  const numWalls = Math.max(3, Math.floor(size * size * 0.12));
+  let placed = 0, tries = 0;
+  while (placed < numWalls && tries < 100) {
+    tries++;
+    const r = Math.floor(Math.random() * size);
+    const c = Math.floor(Math.random() * size);
+    if (r === center && c === center) continue;
+    if (grid[r][c].wall) continue;
+    grid[r][c].wall = true;
+    placed++;
+  }
+  // Place 4 options on empty non-center cells
+  const positions = [];
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (!grid[r][c].wall && !(r === center && c === center)) {
+        positions.push({r, c});
+      }
+    }
+  }
+  shuffle(positions);
+  for (let i = 0; i < 4 && i < positions.length; i++) {
+    const {r, c} = positions[i];
+    grid[r][c].option = { text: q.options[i], isCorrect: i === q.correct };
+  }
+  return grid;
+}
+function isMazeReachable(grid, size) {
+  const center = Math.floor(size/2);
+  const visited = Array.from({length: size}, () => Array(size).fill(false));
+  const queue = [{r: center, c: center}];
+  visited[center][center] = true;
+  while (queue.length) {
+    const {r, c} = queue.shift();
+    for (const [dr, dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+      const nr = r + dr, nc = c + dc;
+      if (nr < 0 || nr >= size || nc < 0 || nc >= size) continue;
+      if (visited[nr][nc] || grid[nr][nc].wall) continue;
+      visited[nr][nc] = true;
+      queue.push({r: nr, c: nc});
+    }
+  }
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (grid[r][c].option && !visited[r][c]) return false;
+    }
+  }
+  return true;
+}
+function drawMazeGrid() {
+  const { grid, playerPos } = gameState;
+  const size = grid.length;
+  const gridEl = document.getElementById('maze-grid');
+  if (!gridEl) return;
+  let html = '';
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      const cell = grid[r][c];
+      let cls = 'maze-cell';
+      let content = '';
+      if (cell.wall) {
+        cls += ' wall';
+      } else if (playerPos.r === r && playerPos.c === c) {
+        cls += ' player';
+        content = '●';
+      } else if (cell.option) {
+        cls += ' option';
+        const t = cell.option.text;
+        content = t.length > 10 ? t.slice(0,10) + '…' : t;
+      }
+      html += `<div class="${cls}">${escapeHtml(content)}</div>`;
+    }
+  }
+  gridEl.innerHTML = html;
+}
+function movePlayer(dr, dc) {
+  if (gameState.answered) return;
+  if (!gameState.grid) return;
+  const { grid, playerPos } = gameState;
+  const size = grid.length;
+  const nr = playerPos.r + dr;
+  const nc = playerPos.c + dc;
+  if (nr < 0 || nr >= size || nc < 0 || nc >= size) return;
+  if (grid[nr][nc].wall) return;
+
+  const target = grid[nr][nc];
+  if (target.option) {
+    if (target.option.isCorrect) {
+      gameState.answered = true;
+      gameState.score++;
+      flashMazeCell(nr, nc, 'correct');
+      updateMazeScore();
+      setTimeout(() => {
+        gameState.idx++;
+        if (gameState.idx < gameState.quiz.questions.length) renderMaze();
+        else showResult(gameState.quiz);
+      }, 1200);
+    } else {
+      gameState.score = Math.max(0, gameState.score - 1);
+      gameState.answered = true;
+      flashMazeCell(nr, nc, 'wrong');
+      updateMazeScore();
+      setTimeout(() => {
+        grid[nr][nc].option = null;
+        grid[playerPos.r][playerPos.c].player = false;
+        playerPos.r = nr; playerPos.c = nc;
+        grid[nr][nc].player = true;
+        gameState.answered = false;
+        drawMazeGrid();
+      }, 700);
+    }
+    return;
+  }
+  grid[playerPos.r][playerPos.c].player = false;
+  playerPos.r = nr; playerPos.c = nc;
+  grid[nr][nc].player = true;
+  drawMazeGrid();
+}
+function flashMazeCell(r, c, type) {
+  drawMazeGrid();
+  const cells = document.querySelectorAll('#maze-grid .maze-cell');
+  const size = gameState.grid.length;
+  const idx = r * size + c;
+  if (cells[idx]) {
+    cells[idx].classList.add(type === 'correct' ? 'flash-correct' : 'flash-wrong');
+    cells[idx].innerHTML = type === 'correct' ? '✓' : '✗';
+  }
+}
+function updateMazeScore() {
+  const el = document.querySelector('.game-score');
+  if (el) el.textContent = 'Score: ' + gameState.score;
+}
+
+/* Keyboard controls for maze */
+document.addEventListener('keydown', (e) => {
+  if (currentMode !== 'maze') return;
+  if (!gameState.grid) return;
+  if (!document.getElementById('game-view').classList.contains('active')) return;
+  let dr = 0, dc = 0;
+  const k = e.key.toLowerCase();
+  if (e.key === 'ArrowUp' || k === 'w') dr = -1;
+  else if (e.key === 'ArrowDown' || k === 's') dr = 1;
+  else if (e.key === 'ArrowLeft' || k === 'a') dc = -1;
+  else if (e.key === 'ArrowRight' || k === 'd') dc = 1;
+  else return;
+  e.preventDefault();
+  movePlayer(dr, dc);
+});
+
+/* ===== RESULT ===== */
 function showResult(quiz) {
   const score = gameState.score || 0;
   const total = quiz.questions.length;
@@ -486,7 +1114,7 @@ function showResult(quiz) {
   if (pct >= 70) fireConfetti();
 }
 
-/* CONFETTI */
+/* ===== CONFETTI ===== */
 function fireConfetti() {
   const colors = ['#FF6B6B','#4ECDC4','#FFE66D','#A29BFE','#FF9F43','#55EFC4'];
   for (let i = 0; i < 80; i++) {
@@ -507,15 +1135,12 @@ function fireConfetti() {
   }
 }
 
-/* INIT */
+/* ===== INIT ===== */
 window.addEventListener('DOMContentLoaded', () => {
   const s = localStorage.getItem(SESSION_KEY);
-  if (s) {
-    try { session = JSON.parse(s); } catch(e) { session = null; }
-  }
+  if (s) { try { session = JSON.parse(s); } catch(e) { session = null; } }
   if (session) showApp();
   else document.getElementById('auth-screen').style.display = 'flex';
-
   document.getElementById('auth-form').addEventListener('submit', handleAuth);
 });
 </script>
