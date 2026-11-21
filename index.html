@@ -344,7 +344,7 @@ const TEST_USERS = [
   { email: 'testuser4@gmail.com', password: 'testuser4', name: 'testuser 4' }
 ];
 const SESSION_KEY = 'quizzes_session';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ===== STATE ===== */
 let session = null;
@@ -447,7 +447,7 @@ async function handleAuth(e) {
       if (TEST_USERS.find(u => u.email === email)) { errEl.textContent = 'This email is reserved for a test user.'; return; }
       if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
       if (!name) { errEl.textContent = 'Please enter your display name.'; return; }
-      const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name: name } } });
+      const { data, error } = await _supabase.auth.signUp({ email, password, options: { data: { name: name } } });
       if (error) { errEl.textContent = error.message; return; }
       await sendWelcomeEmail(email, name);
       infoEl.textContent = 'Account created! Check your inbox for a verification email, then log in.';
@@ -456,7 +456,7 @@ async function handleAuth(e) {
       document.getElementById('auth-password').value = '';
       return;
     }
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
     if (error) {
       if (error.message.toLowerCase().includes('not confirmed')) errEl.textContent = 'Email not verified yet — please click the link in your verification email.';
       else errEl.textContent = error.message;
@@ -476,7 +476,7 @@ async function logout() {
   stopMazeTimers();
   session = null; currentMode = null;
   localStorage.removeItem(SESSION_KEY);
-  try { await supabase.auth.signOut(); } catch(e) {}
+  try { await _supabase.auth.signOut(); } catch(e) {}
   document.getElementById('app').classList.remove('visible');
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('auth-form').reset();
@@ -504,7 +504,7 @@ function showView(name) {
 
 /* ===== STORAGE ===== */
 async function loadQuizzes() {
-  const { data, error } = await supabase.from('quizzes').select('*').order('created_at', { ascending: false });
+  const { data, error } = await _supabase.from('quizzes').select('*').order('created_at', { ascending: false });
   if (error) { showToast('Failed to load quizzes: ' + error.message, 'error', 4000); quizzes = []; return; }
   quizzes = data || [];
 }
@@ -618,7 +618,7 @@ function deleteQuiz(id) {
   const q = quizzes.find(x => x.id === id);
   if (!q) return;
   showConfirm(`"${q.title}" will be permanently deleted.`, async () => {
-    const { error } = await supabase.from('quizzes').delete().eq('id', id);
+    const { error } = await _supabase.from('quizzes').delete().eq('id', id);
     if (error) { showToast('Delete failed: ' + error.message, 'error'); return; }
     await loadQuizzes();
     renderDashboard();
@@ -684,12 +684,12 @@ async function saveQuiz() {
   }
   if (questions.length === 0) { showToast('Add at least one question', 'error'); return; }
   if (editingId) {
-    const { error } = await supabase.from('quizzes').update({ title, description, template: selectedTemplate, questions, updated_at: Date.now() }).eq('id', editingId);
+    const { error } = await _supabase.from('quizzes').update({ title, description, template: selectedTemplate, questions, updated_at: Date.now() }).eq('id', editingId);
     if (error) { showToast('Update failed: ' + error.message, 'error'); return; }
     showToast('Quiz updated!', 'success');
   } else {
     const id = 'quiz_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
-    const { error } = await supabase.from('quizzes').insert({ id, title, description, template: selectedTemplate, questions, created_by: session.email, created_at: Date.now() });
+    const { error } = await _supabase.from('quizzes').insert({ id, title, description, template: selectedTemplate, questions, created_by: session.email, created_at: Date.now() });
     if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
     showToast('Quiz created!', 'success');
   }
@@ -1166,7 +1166,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (stored) { try { session = JSON.parse(stored); } catch(e) { session = null; } }
   if (!session) {
     try {
-      const { data } = await supabase.auth.getSession();
+      const { data } = await _supabase.auth.getSession();
       if (data.session) {
         const u = data.session.user;
         const dispName = u?.user_metadata?.name || u?.email || 'User';
@@ -1175,7 +1175,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       }
     } catch(e) {}
   }
-  supabase.auth.onAuthStateChange(async (event, sbSession) => {
+  _supabase.auth.onAuthStateChange(async (event, sbSession) => {
     if (event === 'SIGNED_IN' && sbSession && !session) {
       const u = sbSession.user;
       const dispName = u?.user_metadata?.name || u?.email || 'User';
